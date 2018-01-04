@@ -7,4 +7,24 @@ type Link @model {
 
   description: String!
   url: String!
+
+  postedBy: User @relation(name: "UsersLinks")
 }
+
+
+# added by email-password template: (please uncomment)
+type User @model {
+  # Required system field:
+  id: ID! @isUnique # read-only (managed by Graphcool)
+
+  # Optional system fields (remove if not needed):
+  createdAt: DateTime! # read-only (managed by Graphcool)
+  updatedAt: DateTime! # read-only (managed by Graphcool)
+
+  email: String! @isUnique
+  password: String
+  name: String!
+
+  links: [Link!]! @relation(name: "UsersLinks")
+}
+
