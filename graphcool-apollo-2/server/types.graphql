@@ -1,0 +1,10 @@
+type Link @model {
+
+  # read only
+  id: ID! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+
+  description: String!
+  url: String!
+}
