@@ -6,6 +6,10 @@ import Link from './Link';
 
 class LinkList extends React.Component {
 
+  componentDidMount() {
+    this._subscribeToNewLinks();
+  }
+
   render() {
 
     if (this.props.allLinksQuery && this.props.allLinksQuery.loading) {
@@ -15,6 +19,7 @@ class LinkList extends React.Component {
     if (this.props.allLinksQuery && this.props.allLinksQuery.error) {
       return <div>Error!</div>;
     }
+    console.log(this.props.allLinksQuery)
 
     return (
       <div>
@@ -37,6 +42,48 @@ class LinkList extends React.Component {
     votedLinks.votes = createVote.link.votes;
 
     store.writeQuery({ query: ALL_LINKS_QUERY, data });
+  }
+
+  _subscribeToNewLinks = () => {
+    this.props.allLinksQuery.subscribeToMore({
+      document: gql`
+        subscription {
+          Link(filter: {
+            mutation_in: [CREATED]
+          }) {
+            node {
+              id
+              createdAt
+              updatedAt
+              url
+              description
+              postedBy {
+                id
+                name
+              }
+              votes {
+                id
+                user {
+                  id
+                }
+              }
+            }
+          }
+        }
+      `,
+      updateQuery: (previous, { subscriptionData }) => {
+        const newAllLinks = [
+          subscriptionData.data.Link.node,
+          ...previous.allLinks
+        ];
+        const result = {
+          ...previous,
+          allLinks: newAllLinks 
+        };
+        console.log(result)
+        return result;
+      }
+    });
   }
 
 }
